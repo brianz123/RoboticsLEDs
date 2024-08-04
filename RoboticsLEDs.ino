@@ -2,13 +2,14 @@
 
 #include <FastLED.h>
 
-#define sel0 0       //NEED TO FIX
-#define sel1 1       //NEED TO FIX
+#define SEL0 0       //NEED TO FIX
+#define SEL1 1       //NEED TO FIX
 #define LED_PIN 3    //NEED TO FIX
-#define NUM_LEDS 45  //NEED TO FIX
+#define NUM_LEDS 600  //NEED TO FIX
 
 //defs for effects
-
+#define DIVE_SECTIONS 4
+#define FLICKER_NUM 5
 // #define debug 1
 // #define debugln 1
 
@@ -31,15 +32,28 @@ CRGB leds[NUM_LEDS];
 int sel;
 int i = 0;  //primary counter
 int j = 0;  //sencondar counter
-int options[4][2] = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } };
+
 void setup() {
   // put your setup code here, to run once:
+  // Serial.begin(9600);
   FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, NUM_LEDS);
+
+
+  //Flash blue as intialization
+  for (int m = 0; m < FLICKER_NUM; m++) {
+    for (int k = 0; k < NUM_LEDS; k++) {
+      leds[k] = CRGB::Blue;
+    }
+    delay(25);
+    for (int k = 0; k < NUM_LEDS; k++) {
+      leds[k] = CRGB::Black;
+    }
+  }
 }
 
 void loop() {
-  int s0 = digitalRead(sel0);
-  int s1 = digitalRead(sel1);
+  int s0 = digitalRead(SEL0);
+  int s1 = digitalRead(SEL1);
   sel = s0 + s1 * 10;
 
   switch (sel) {
@@ -51,6 +65,8 @@ void loop() {
       nominalRun();
     case 11:  // binary 11 - 3
       error();
+    default:
+      leds[i] = CRGB::Blue;
   }
   inc();
   FastLED.show();
@@ -59,7 +75,6 @@ void loop() {
 
 void startUp() {
   // running yellow
-
   uint8_t yellowIntensity = sin8(j + i * 10);  // Create a phase shift for each LED
 
   uint8_t red = yellowIntensity;
@@ -78,10 +93,14 @@ void dive() {
   //running red
   leds[i] = CRGB::Red;
   for (int k = 0; k < 3; k++) {
-    if (i > 1 + k)
-      leds[i - k - 1] = CRGB::Black;
+    if (i > 1 + k) {
+      for (int m = 0; m < DIVE_SECTIONS; m++) {
+        if (i / DIVE_SECTIONS < NUM_LEDS / DIVE_SECTIONS)
+          leds[i * (m + 1) - k - 1] = CRGB::Black;
+      }
+    }
   }
-  delay(10)
+  delay(10);
 }
 
 void nominalRun() {
@@ -94,17 +113,17 @@ void error() {
   //flashing red
   bool onOff = i % 2 == 0;
   if (onOff) {
-    for (int k = 0; k < NUM_LEDS; k += 2) {
+    for (int k = 0; k < NUM_LEDS-1; k += 2) {
       leds[k] = CRGB::Red;
-      leds[k + 1] = CRGB::Black
+      leds[k + 1] = CRGB::Black;
     }
-    else {
-      for (int k = 0; k < NUM_LEDS; k += 2) {
-        leds[k + 1] = CRGB::Red;
-        leds[k] = CRGB::Black;
-      }
+  } else {
+    for (int k = 0; k < NUM_LEDS-1; k += 2) {
+      leds[k + 1] = CRGB::Red;
+      leds[k] = CRGB::Black;
     }
   }
+
   delay(250);
 }
 
