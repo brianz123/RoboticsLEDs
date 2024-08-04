@@ -1,15 +1,13 @@
-#include <Wire.h>
-
-#include <FastLED.h>
+#include "FastLED.h"
 
 #define SEL0 0       //NEED TO FIX
 #define SEL1 1       //NEED TO FIX
-#define LED_PIN 3    //NEED TO FIX
-#define NUM_LEDS 600  //NEED TO FIX
+#define DATA_PIN 3   
+#define NUM_LEDS 40  //NEED TO FIX
+#define BRIGHTNESS 150
 
 //defs for effects
 #define DIVE_SECTIONS 4
-#define FLICKER_NUM 5
 // #define debug 1
 // #define debugln 1
 
@@ -35,20 +33,12 @@ int j = 0;  //sencondar counter
 
 void setup() {
   // put your setup code here, to run once:
-  // Serial.begin(9600);
-  FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, NUM_LEDS);
-
-
-  //Flash blue as intialization
-  for (int m = 0; m < FLICKER_NUM; m++) {
-    for (int k = 0; k < NUM_LEDS; k++) {
-      leds[k] = CRGB::Blue;
-    }
-    delay(25);
-    for (int k = 0; k < NUM_LEDS; k++) {
-      leds[k] = CRGB::Black;
-    }
-  }
+  Serial.begin(115200);
+  pinMode(LED_BUILTIN, INPUT);
+  FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+ //Flash blue as intialization
+  flash(CRGB::Blue, 250, 1000);
 }
 
 void loop() {
@@ -132,4 +122,20 @@ void inc() {
   i++;
   if (i > NUM_LEDS)
     i = 0;
+}
+
+void flash(CRGB color, int del, int n){
+  Serial.println("flashing");
+for (int m = 0; m < n; m++) { 
+    for (int k = 0; k < NUM_LEDS; k++) {
+      leds[k] = CRGB::Blue;
+    }
+    digitalWrite(LED_BUILTIN, 255);
+    delay(del);
+    for (int k = 0; k < NUM_LEDS; k++) {
+      leds[k] = CRGB::Black;
+    }
+    digitalWrite(LED_BUILTIN, 0);
+    delay(del);
+  }
 }
