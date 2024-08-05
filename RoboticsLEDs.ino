@@ -1,10 +1,10 @@
 #include "FastLED.h"
 
-#define SEL0 0       //NEED TO FIX
-#define SEL1 1       //NEED TO FIX
-#define DATA_PIN 3   
-#define NUM_LEDS 40  //NEED TO FIX
-#define BRIGHTNESS 150
+#define SEL0 2  //NEED TO FIX
+#define SEL1 3    //NEED TO FIX
+#define DATA_PIN 6
+#define NUM_LEDS 8  //NEED TO FIX
+#define BRIGHTNESS 255
 
 //defs for effects
 #define DIVE_SECTIONS 4
@@ -21,7 +21,7 @@ void setup() {
   pinMode(LED_BUILTIN, INPUT);
   FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
   FastLED.setBrightness(BRIGHTNESS);
- //Flash blue as intialization
+  //Flash blue as intialization
   flash(CRGB::Orange, 250, 3);
 }
 
@@ -29,21 +29,27 @@ void loop() {
   int s0 = digitalRead(SEL0);
   int s1 = digitalRead(SEL1);
   sel = s0 + s1 * 10;
-
+  Serial.print("Selction val is: ");
+  Serial.println(sel);
   switch (sel) {
     case 0:  // binary 00 - 0
       startUp();
+      break;
     case 1:  // binary 01 - 1
       dive();
+      break;
     case 10:  // binary 10 - 2
       nominalRun();
+      break;
     case 11:  // binary 11 - 3
       error();
+      break;
     default:
       leds[i] = CRGB::Blue;
   }
   inc();
-  FastLED.show();
+  delay(250);
+  // FastLED.show();
   // put your main code here, to run repeatedly:
 }
 
@@ -61,47 +67,52 @@ void startUp() {
       j = 0;
   leds[i] = CRGB(red, green, blue);
   delay(20);
+  FastLED.show();
 }
 
 void dive() {
   //running Red/Blue
-for (int m = 0; m < n; m++) { 
-    for (int k = 0; k < NUM_LEDS; k++) {
-      leds[k] = CRGB::Blue;
-      FastLED.show();
-    }
-    digitalWrite(LED_BUILTIN, 255);
-    delay(del);
-    for (int k = 0; k < NUM_LEDS; k++) {
-      leds[k] = CRGB::OrangeRed;
-      FastLED.show();
-    }
-    digitalWrite(LED_BUILTIN, 0);
-    delay(del);
-  }
+  Serial.println("diving");
+  flash(CRGB(255,50,0), 100, 1);
+  // for (int k = 0; k < NUM_LEDS; k++) {
+  //   leds[k] = CRGB::Blue;
+  //   FastLED.show();
+  //   delay(100);
+  // }
+  // digitalWrite(LED_BUILTIN, 255);
+
+  // for (int k = 0; k < NUM_LEDS; k++) {
+  //   leds[k] = CRGB::Red;
+  //   FastLED.show();
+  //   delay(100);
+  // }
+  // digitalWrite(LED_BUILTIN, 0);
 }
 
 void nominalRun() {
   //solid green
+  Serial.println("Nominal Run");
   leds[i] = CRGB::Green;
-  delay(5);
+  delay(50);
+  FastLED.show();
 }
 
 void error() {
   //flashing red
+  Serial.println("Error");
   bool onOff = i % 2 == 0;
   if (onOff) {
-    for (int k = 0; k < NUM_LEDS-1; k += 2) {
+    for (int k = 0; k < NUM_LEDS - 1; k += 2) {
       leds[k] = CRGB::Red;
       leds[k + 1] = CRGB::Black;
     }
   } else {
-    for (int k = 0; k < NUM_LEDS-1; k += 2) {
+    for (int k = 0; k < NUM_LEDS - 1; k += 2) {
       leds[k + 1] = CRGB::Red;
       leds[k] = CRGB::Black;
     }
   }
-
+  FastLED.show();
   delay(250);
 }
 
@@ -112,20 +123,18 @@ void inc() {
     i = 0;
 }
 
-void flash(CRGB color, int del, int n){
-  Serial.println("flashing");
-for (int m = 0; m < n; m++) { 
+void flash(CRGB color, int del, int n) {
+  // Serial.println("flashing");
+  for (int m = 0; m < n; m++) {
     for (int k = 0; k < NUM_LEDS; k++) {
-      leds[k] = CRGB::color;
+      leds[k] = color;
       FastLED.show();
     }
-    digitalWrite(LED_BUILTIN, 255);
     delay(del);
     for (int k = 0; k < NUM_LEDS; k++) {
       leds[k] = CRGB::Black;
       FastLED.show();
     }
-    digitalWrite(LED_BUILTIN, 0);
     delay(del);
   }
 }
