@@ -8,22 +8,6 @@
 
 //defs for effects
 #define DIVE_SECTIONS 4
-// #define debug 1
-// #define debugln 1
-
-
-// #ifdef debug
-// debug(str) = Serial.print(str);
-// #else
-// debug(str);
-// #endif
-
-// #ifdef debugln
-// debug(str) = Serial.println(str);
-// #else
-// debugln(str);
-// #endif
-
 
 CRGB leds[NUM_LEDS];
 
@@ -38,7 +22,7 @@ void setup() {
   FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
   FastLED.setBrightness(BRIGHTNESS);
  //Flash blue as intialization
-  flash(CRGB::Blue, 250, 1000);
+  flash(CRGB::Orange, 250, 3);
 }
 
 void loop() {
@@ -80,17 +64,21 @@ void startUp() {
 }
 
 void dive() {
-  //running red
-  leds[i] = CRGB::Red;
-  for (int k = 0; k < 3; k++) {
-    if (i > 1 + k) {
-      for (int m = 0; m < DIVE_SECTIONS; m++) {
-        if (i / DIVE_SECTIONS < NUM_LEDS / DIVE_SECTIONS)
-          leds[i * (m + 1) - k - 1] = CRGB::Black;
-      }
+  //running Red/Blue
+for (int m = 0; m < n; m++) { 
+    for (int k = 0; k < NUM_LEDS; k++) {
+      leds[k] = CRGB::Blue;
+      FastLED.show();
     }
+    digitalWrite(LED_BUILTIN, 255);
+    delay(del);
+    for (int k = 0; k < NUM_LEDS; k++) {
+      leds[k] = CRGB::OrangeRed;
+      FastLED.show();
+    }
+    digitalWrite(LED_BUILTIN, 0);
+    delay(del);
   }
-  delay(10);
 }
 
 void nominalRun() {
@@ -128,12 +116,14 @@ void flash(CRGB color, int del, int n){
   Serial.println("flashing");
 for (int m = 0; m < n; m++) { 
     for (int k = 0; k < NUM_LEDS; k++) {
-      leds[k] = CRGB::Blue;
+      leds[k] = CRGB::color;
+      FastLED.show();
     }
     digitalWrite(LED_BUILTIN, 255);
     delay(del);
     for (int k = 0; k < NUM_LEDS; k++) {
       leds[k] = CRGB::Black;
+      FastLED.show();
     }
     digitalWrite(LED_BUILTIN, 0);
     delay(del);
