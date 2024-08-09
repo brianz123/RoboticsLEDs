@@ -14,6 +14,8 @@
 #define DATA_PIN 6
 #define NUM_LEDS 6  //NEED TO FIX
 #define BRIGHTNESS 255
+#define ONE_MIN 60000
+#define THIRTY_SEC 30000
 
 //defs for effects
 #define DIVE_SECTIONS 4
@@ -24,6 +26,7 @@ int sel;
 int i = 0;  //primary counter
 int j = 0;  //sencondar counter
 bool upDown = true;
+int timer = millis();
 
 
 void setup() {
@@ -47,12 +50,21 @@ void setup() {
 
 
 void loop() {
+  timer = millis();
   int s0 = digitalRead(SEL0);
   int s1 = digitalRead(SEL1);
   sel = s0 + s1 * 10;
   // Serial.print("Selction val is: ");
   // Serial.println(sel);
-  switch (sel) {
+if(timer < THIRTY_SEC)
+  startUp();
+  else if(timer < ONE_MIN)
+  dive();
+  else
+  nominalRun();
+
+  
+ /* switch (sel) {
     case 0:  // binary 00 - 0
       nominalRun();
       break;
@@ -69,6 +81,7 @@ void loop() {
     default:
       leds[i] = CRGB::Blue;
   }
+ */
   inc();
   // FastLED.show();
   // put your main code here, to run repeatedly:
