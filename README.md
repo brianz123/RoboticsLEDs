@@ -53,5 +53,3 @@ This code was developed as part of the Cubo submarine project by **Robotics@Mary
 ## Author
 
 **Brian Zagalsky**  
-Electrical Engineering Student  
-University of Maryland, College Park
